@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+		<style>
+			ul, li {
+				margin: 3px;
+				padding: 0;
+				border: 0;
+				font-family:'Comfortaa', cursive;
+				font-size: 30px;
+				
+			}
+
+
+
+			body {
+				line-height: 1;
+				font-family: "Lato", sans-serif;
+				background-color: #32b7ff;
+			}
+
+			.container {
+				width: 70%;
+				margin: 1em auto 3em;
+				border: 0px solid #efefef;
+			}
+
+			.panel, li {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				list-style-type: none;
+				border: 3px outset blue;
+				background-color: #E7E8EB;
+			}
+
+
+			.text-input {
+				border: 1px solid #dedede;
+				padding-left: 10px;
+				width: 70%;
+				height: 35px;
+				color: #555;
+				
+			}
+
+
+			button {
+				color: #555;
+				background-color: #FFFFFF;
+				border: 3mm ridge #32a1ce;
+				outline: 0;
+				
+				
+				cursor: pointer;
+				font-size: 20px;
+				font-family: 'Fredoka One', cursive;
+			}
+			input {
+				
+				height: 50px;
+				border: thick double #32a1ce;
+				font-size: 30px;
+				
+				
+			}
+			h1 {
+				font-family: 'Fredoka one', cursive;
+				text-align: center;
+				font-size:60px;
+				border:12px inset blue;
+				align-items: center;
+				background-color: #FFFFFF;
+				
+
+			}
+			.inputing {
+				border: thick double #32a1ce;
+				
+			}
+			.lol{
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				list-style-type: none;
+				
+				border: 3px inset blue;
+				background-color: #1C7EFF;
+				
+			}
+			.input {
+				height: 50px;
+				border: thick double #5CADFF;
+				font-size: 50px;
+				font-family: 'Audiowide', cursive;
+				width:700px;
+			}
+
+
+
+
+			.text-input2 {
+				border: 1px solid #dedede;
+				padding-left: 10px;
+				width: 70%;
+				height: 35px;
+				color: #555;
+				font-family:'Comfortaa', cursive;
+				font-size: 30px;
+			}
+			button:hover { 
+				background-color: red;
+				color:white;
+				border: 3mm ridge #B80003;
+			}
+			.container{
+				border:0;
+			}
+		</style>
+  </head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Audiowide|Comfortaa|Fredoka+One|Shadows+Into+Light"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <meta charset="utf-8" />
+
+    <script
+      type="text/javascript"
+      charset="utf-8"
+      src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"
+    ></script>
+    <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+  </head>
+  <h1>To-do list</h1>
+  <div class="container" id="todo">
+    <section class="lol">
+      <input
+        type="checkbox"
+        id="mark-all"
+        @click
+        text-inputlick="selectAll"
+        :checked="areAllSelected"
+      />
+      <input
+        class="input text-input"
+        v-model="newTask"
+        @keyup.enter="addTask"
+        placeholder="Add task to TO-DO LIST"
+        autofocus
+      />
+      <button @click="clearList">Clear List</button>
+    </section>
+
+    <section class="list">
+      <ul class="list-item">
+        <li v-for="task in tasks" :class="{done: isChecked(task)}">
+          <input
+            type="checkbox"
+            class="checkbox"
+            @click="check"
+            v-model="task.checked"
+          />
+
+          <input
+            class="finishornot text-input2"
+            type="text"
+            v-if="task === editingTask"
+            v-auto-focus
+            @keyup.enter="endEditing(task)"
+            @blur="endEditing(task)"
+            v-model="task.text"
+          />
+
+          <label
+            class="#lol5 "
+            for="checkbox"
+            v-if="task !== editingTask"
+            @dblclick="editTask(task)"
+            >{{ task.text }}</label
+          >
+
+          <button class="delete" @click="removeTask(task)">X</button>
+        </li>
+      </ul>
+    </section>
+  </div>
+  <script src="app.js"></script>
+  <script>
+    "use strict";
+
+    Vue.directive("auto-focus", {
+      bind: function() {
+        Vue.nextTick(
+          function() {
+            this.el.focus();
+          }.bind(this)
+        );
+      }
+    });
+
+    new Vue({
+      el: "#todo",
+
+      data: {
+        newTask: "",
+        tasks: [
+          {
+            text: "This is an example task. Delete or add your own",
+            checked: false
+          }
+        ],
+
+        editingTask: {}
+      },
+
+      computed: {
+        areAllSelected: function() {
+          return (
+            this.tasks.every(function(task) {
+              return task.checked;
+            }) && this.tasks.length > 0
+          );
+        }
+      },
+
+      methods: {
+        addTask: function() {
+          var task = this.newTask.trim();
+          if (task) {
+            this.tasks.push({ text: task, checked: false });
+            this.newTask = "";
+          }
+        },
+
+        removeTask: function(task) {
+          var index = this.tasks.indexOf(task);
+          this.tasks.splice(index, 1);
+        },
+
+        editTask: function(task) {
+          this.editingTask = task;
+        },
+
+        endEditing: function(task) {
+          this.editingTask = {};
+          if (task.text.trim() === "") {
+            this.removeTask(task);
+          }
+        },
+
+        clearList: function() {
+          this.tasks = [];
+        },
+
+        selectAll: function(task) {
+          var targetValue = this.areAllSelected ? false : true;
+          for (var i = 0; i < this.tasks.length; i++) {
+            this.tasks[i].checked = targetValue;
+          }
+        },
+
+        check: function(task) {
+          task.checked = true;
+        },
+
+        isChecked: function(task) {
+          return task.checked;
+        }
+      }
+    });
+  </script>
+</html>
